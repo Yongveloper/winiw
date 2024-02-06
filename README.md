@@ -1,14 +1,17 @@
-# trade-market-FE
+# WINIW-FE
+
 물물교환마켓 프론트엔드
 
 <br />
 
-## 🔗 FE 배포 주소 
-[👫 Trade-market](https://trade-market-fe.vercel.app/)
+## 🔗 FE 배포 주소
+
+[👫 WINIW](https://winiw.vercel.app/)
 
 <br />
 
 ## 💡 커밋 컨벤션
+
 - feat : 새로운 기능 추가
 - fix : 버그 수정
 - docs : 문서 수정
