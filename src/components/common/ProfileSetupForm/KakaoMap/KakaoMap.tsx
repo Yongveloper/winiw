@@ -7,25 +7,25 @@ import SetCurrentLocationBtn from '@components/common/ProfileSetupForm/SetCurren
 interface IKakaoMapProps {
   selectedAddress: string;
   handleAddressSelect: (address: string) => void;
+  handleRegionCode: (code: string) => void;
   closeAddressModal: () => void;
 }
 
 function KakaoMap({
   selectedAddress,
   handleAddressSelect,
+  handleRegionCode,
   closeAddressModal,
 }: IKakaoMapProps) {
   const container = useRef<HTMLDivElement>(null);
   const currentPosition = useCurrentPosition();
   const [addressInfo, setAddressInfo] = useState({
     region_1depth_name: '',
+    region_2depth_name: '',
     region_3depth_name: '',
   });
 
   const handleCompleteBtn = () => {
-    handleAddressSelect(
-      `${addressInfo.region_1depth_name} ${addressInfo.region_3depth_name}`
-    );
     closeAddressModal();
   };
 
@@ -54,12 +54,17 @@ function KakaoMap({
     geocoder.coord2RegionCode(longitude, latitude, (result, status) => {
       if (status === kakao.maps.services.Status.OK) {
         //result[0] == 법정동, result[1] == 행정동
-        const { region_1depth_name, region_3depth_name } = result[1];
-
+        const { region_1depth_name, region_2depth_name, region_3depth_name } =
+          result[1];
+        handleRegionCode(result[1].code);
         setAddressInfo({
           region_1depth_name,
+          region_2depth_name,
           region_3depth_name,
         });
+        handleAddressSelect(
+          `${region_1depth_name} ${region_2depth_name} ${region_3depth_name}`
+        );
       }
     });
   };
@@ -89,10 +94,17 @@ function KakaoMap({
           const latitude = Number(y);
           const longitude = Number(x);
           const coords = new kakao.maps.LatLng(latitude, longitude);
+          handleRegionCode(result[0].address.h_code);
           setAddressInfo({
             region_1depth_name: address.split(' ')[0],
+            region_2depth_name: address.split(' ')[1],
             region_3depth_name: region_3depth_h_name,
           });
+          handleAddressSelect(
+            `${address.split(' ')[0]} ${
+              address.split(' ')[1]
+            } ${region_3depth_h_name}`
+          );
           resolve(coords);
         } else {
           resolve(null);
@@ -127,7 +139,7 @@ function KakaoMap({
     <K.Container ref={container}>
       <SetCurrentLocationBtn onClick={displayMapBasedOnCurrentPosition} />
       <CurrentLocation
-        addressInfo={`${addressInfo.region_1depth_name} ${addressInfo.region_3depth_name}`}
+        addressInfo={`${addressInfo.region_1depth_name} ${addressInfo.region_2depth_name} ${addressInfo.region_3depth_name}`}
         handleCompleteBtn={handleCompleteBtn}
       />
     </K.Container>

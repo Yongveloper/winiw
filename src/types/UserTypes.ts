@@ -3,9 +3,14 @@ import { IResponse } from './AuthTypes';
 export type GradeType = 'one' | 'two' | 'three' | 'four' | null;
 
 interface IAddress {
-  id: string;
-  city: string;
-  name: string;
+  bdongName: string;
+  eupMyeon: string | null;
+  guGunSi: string;
+  hdongCode: string;
+  hdongName: string;
+  id: number;
+  ri: string | null;
+  siDo: string;
 }
 
 export interface IUser {

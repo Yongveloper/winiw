@@ -31,17 +31,22 @@ const MapContainer = styled.div`
 `;
 
 interface IAddressSettingProps {
-  selectedAddress: string;
-  handleAddressSelect: (address: string) => void;
+  defaultAddress: string;
+  handleRegionCode: (code: string) => void;
 }
 
 function AddressSetting({
-  selectedAddress,
-  handleAddressSelect,
+  defaultAddress,
+  handleRegionCode,
 }: IAddressSettingProps) {
   const open = useDaumPostcodePopup();
 
   const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(defaultAddress || '');
+
+  const handleAddressSelect = (address: string) => {
+    setSelectedAddress(address);
+  };
 
   const closeAddressModal = () => {
     setAddressModalOpen(false);
@@ -97,6 +102,7 @@ function AddressSetting({
           <KakaoMap
             selectedAddress={selectedAddress}
             handleAddressSelect={handleAddressSelect}
+            handleRegionCode={handleRegionCode}
             closeAddressModal={closeAddressModal}
           />
         </MapContainer>

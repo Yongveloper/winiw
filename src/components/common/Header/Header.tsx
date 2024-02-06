@@ -15,7 +15,7 @@ const Header = () => {
       <div className="header">
         <div className="item" onClick={() => navigate('/')}>
           {user ? (
-            <div className="location">{user.address.name}</div>
+            <div className="location">{user.address.hdongName}</div>
           ) : (
             <div className="location non-user">내 위치</div>
           )}

@@ -4,7 +4,7 @@ import ProfileSetupForm from '@components/common/ProfileSetupForm';
 import CommonModal from '@components/common/CommonModal';
 import useModal from '@hooks/useModal';
 import SignUpSuccessModal from '@components/Signup/SignUpSuccessModal';
-import { NewUserResponse } from '@/types/AuthTypes';
+import { IRegisterRequest, NewUserResponse } from '@/types/AuthTypes';
 import { useSignUpMutation } from '@store/api/authApiSlice';
 import Spinner from '@components/Auth/Spinner';
 
@@ -47,25 +47,23 @@ function SignUp() {
 
   const handleSubmit = async (
     nickname: string,
-    address: string,
+    regionCode: string,
     profileImgFile: File | null
   ) => {
-    const [city, name] = address.split(' ');
-    const signUpData = {
+    const signupData: IRegisterRequest = {
       authId,
       authType,
       nickname,
       profileImage,
       // imageFile: profileImgFile,
       addressRequest: {
-        city,
-        name,
+        regionCode,
         type: 'main',
       },
     };
 
     try {
-      await signUp(signUpData).unwrap();
+      await signUp(signupData).unwrap();
       handleSuccessfulSignUp();
     } catch (error: any) {
       if (error.status === 409) {

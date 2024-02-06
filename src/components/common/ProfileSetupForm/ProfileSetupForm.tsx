@@ -28,11 +28,11 @@ function ProfileSetupForm({
   const [profileImgSrc, setProfileImgSrc] = useState(defaultProfileImgSrc);
   const [imgFile, setImgFile] = useState<File | null>(null);
   const [nickname, setNickname] = useState(defaultNickname);
-  const [nicknameError, setNicknameError] = useState<string>('');
-  const [selectedAddress, setSelectedAddress] = useState(defaultAddress || '');
+  const [nicknameError, setNicknameError] = useState('');
+  const [regionCode, setRegionCode] = useState('');
 
-  const handleAddressSelect = useCallback((address: string) => {
-    setSelectedAddress(address);
+  const handleRegionCode = useCallback((code: string) => {
+    setRegionCode(code);
   }, []);
 
   const handleProfileImgSetting = useCallback(
@@ -85,14 +85,14 @@ function ProfileSetupForm({
             handleNickname={handleNickname}
           />
           <AddressSetting
-            selectedAddress={selectedAddress}
-            handleAddressSelect={handleAddressSelect}
+            defaultAddress={defaultAddress || ''}
+            handleRegionCode={handleRegionCode}
           />
         </P.Section>
         <BlueButton
           disabled={nicknameError.length > 1 || !nickname}
           maxWidth="100%"
-          onClick={() => handleSubmit(nickname, selectedAddress, imgFile)}
+          onClick={() => handleSubmit(nickname, regionCode, imgFile)}
         >
           완료
         </BlueButton>
