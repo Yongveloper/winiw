@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import moment from 'moment';
-import 'moment/locale/ko';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 interface IChatTimerops {
   send: boolean;
@@ -8,7 +8,7 @@ interface IChatTimerops {
 }
 
 const ChatTime = ({ send, time }: IChatTimerops) => {
-  const chatTime = moment(time).format('HH:mm');
+  const chatTime = format(time, 'HH:mm', { locale: ko });
 
   return <ChatTimeBlock $send={send}>{chatTime}</ChatTimeBlock>;
 };

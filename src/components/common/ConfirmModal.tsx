@@ -82,7 +82,7 @@ interface IConfirmModalProps {
   content: string;
   confirmedContent?: string;
   closeAction: () => void;
-  onConfirmAction: () => Promise<void>;
+  onConfirmAction: () => Promise<void> | Promise<unknown> | void;
   onCompletedAction?: () => void;
   confirmType?: string;
 }
