@@ -4,6 +4,7 @@ import WritePostSlice from './slices/WritePostSlice';
 import ChatSlice from './slices/ChatSlice';
 import CheckboxSlice from './slices/checkboxSlice';
 import { apiSlice } from '@store/api/apiSlice';
+import coordinateSetupSlice from './slices/coordinateSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     WritePost: WritePostSlice,
     chat: ChatSlice,
     checkbox: CheckboxSlice,
+    coordinateSetup: coordinateSetupSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(

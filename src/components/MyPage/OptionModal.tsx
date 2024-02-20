@@ -11,16 +11,22 @@ interface IOptionModalProps {
   isOpen: boolean;
   close: () => void;
   onLogoutClick: () => void;
+  onDeleteUserClick: () => void;
 }
 
-function OptionModal({ isOpen, close, onLogoutClick }: IOptionModalProps) {
+function OptionModal({
+  isOpen,
+  close,
+  onLogoutClick,
+  onDeleteUserClick,
+}: IOptionModalProps) {
   if (!isOpen) return null;
 
   return (
     <>
       <BottomSheet onClick={close}>
         <LogoutText onClick={onLogoutClick}>로그아웃</LogoutText>
-        <WithDrawText>탈퇴하기</WithDrawText>
+        <WithDrawText onClick={onDeleteUserClick}>탈퇴하기</WithDrawText>
       </BottomSheet>
     </>
   );

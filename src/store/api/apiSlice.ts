@@ -69,5 +69,6 @@ const baseQueryWithIntercept: BaseQueryFn<
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithIntercept,
+  tagTypes: ['User'],
   endpoints: () => ({}),
 });

@@ -11,11 +11,7 @@ interface IProfileSetupFormProps {
   defaultProfileImgSrc: string;
   defaultNickname: string;
   defaultAddress?: string;
-  handleSubmit: (
-    nickname: string,
-    address: string,
-    profileImg: File | null
-  ) => Promise<void>;
+  handleSubmit: (nickname: string, profileImg?: File) => Promise<void>;
 }
 
 function ProfileSetupForm({
@@ -29,11 +25,6 @@ function ProfileSetupForm({
   const [imgFile, setImgFile] = useState<File | null>(null);
   const [nickname, setNickname] = useState(defaultNickname);
   const [nicknameError, setNicknameError] = useState('');
-  const [regionCode, setRegionCode] = useState('');
-
-  const handleRegionCode = useCallback((code: string) => {
-    setRegionCode(code);
-  }, []);
 
   const handleProfileImgSetting = useCallback(
     (imgSrc: string, imgFile: File) => {
@@ -84,15 +75,12 @@ function ProfileSetupForm({
             error={nicknameError}
             handleNickname={handleNickname}
           />
-          <AddressSetting
-            defaultAddress={defaultAddress || ''}
-            handleRegionCode={handleRegionCode}
-          />
+          <AddressSetting defaultAddress={defaultAddress || ''} />
         </P.Section>
         <BlueButton
           disabled={nicknameError.length > 1 || !nickname}
           maxWidth="100%"
-          onClick={() => handleSubmit(nickname, regionCode, imgFile)}
+          onClick={() => handleSubmit(nickname, imgFile)}
         >
           완료
         </BlueButton>

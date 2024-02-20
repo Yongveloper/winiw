@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useEffect } from 'react';
 import { useDaumPostcodePopup, Address } from 'react-daum-postcode';
 import styled from 'styled-components';
 import * as S from '@Pages/SingUp/SignUpStyles';
@@ -8,6 +8,8 @@ import { size } from '@styles/theme';
 import CommonHeader from '@components/common/CommonHeader/CommonHeader';
 import ActionButton from '@components/common/Buttons/ActionButton';
 import KakaoMap from './KakaoMap';
+import { useDispatch } from 'react-redux';
+import { resetState as resetCoordinate } from '@store/slices/coordinateSlice';
 
 const MapContainer = styled.div`
   position: fixed;
@@ -32,15 +34,11 @@ const MapContainer = styled.div`
 
 interface IAddressSettingProps {
   defaultAddress: string;
-  handleRegionCode: (code: string) => void;
 }
 
-function AddressSetting({
-  defaultAddress,
-  handleRegionCode,
-}: IAddressSettingProps) {
+function AddressSetting({ defaultAddress }: IAddressSettingProps) {
   const open = useDaumPostcodePopup();
-
+  const dispatch = useDispatch();
   const [addressModalOpen, setAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(defaultAddress || '');
 
@@ -67,6 +65,12 @@ function AddressSetting({
   const handleSearchBtnClick = () => {
     open({ onComplete: handleComplete, shorthand: false });
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetCoordinate());
+    };
+  }, []);
 
   return (
     <S.Section>
@@ -102,7 +106,6 @@ function AddressSetting({
           <KakaoMap
             selectedAddress={selectedAddress}
             handleAddressSelect={handleAddressSelect}
-            handleRegionCode={handleRegionCode}
             closeAddressModal={closeAddressModal}
           />
         </MapContainer>

@@ -3,18 +3,22 @@ import * as K from './KakaoMapStyles';
 import useCurrentPosition from '@/hooks/useCurrentPosition';
 import CurrentLocation from '@components/common/ProfileSetupForm/CurrentLocation';
 import SetCurrentLocationBtn from '@components/common/ProfileSetupForm/SetCurrentLocationBtn';
+import { useDispatch } from 'react-redux';
+import {
+  setLatitude,
+  setLongitude,
+  setRegionCode,
+} from '@store/slices/coordinateSlice';
 
 interface IKakaoMapProps {
   selectedAddress: string;
   handleAddressSelect: (address: string) => void;
-  handleRegionCode: (code: string) => void;
   closeAddressModal: () => void;
 }
 
 function KakaoMap({
   selectedAddress,
   handleAddressSelect,
-  handleRegionCode,
   closeAddressModal,
 }: IKakaoMapProps) {
   const container = useRef<HTMLDivElement>(null);
@@ -24,6 +28,7 @@ function KakaoMap({
     region_2depth_name: '',
     region_3depth_name: '',
   });
+  const dispatch = useDispatch();
 
   const handleCompleteBtn = () => {
     closeAddressModal();
@@ -56,7 +61,9 @@ function KakaoMap({
         //result[0] == 법정동, result[1] == 행정동
         const { region_1depth_name, region_2depth_name, region_3depth_name } =
           result[1];
-        handleRegionCode(result[1].code);
+        dispatch(setLongitude(longitude));
+        dispatch(setLatitude(latitude));
+        dispatch(setRegionCode(result[1].code));
         setAddressInfo({
           region_1depth_name,
           region_2depth_name,
@@ -94,7 +101,9 @@ function KakaoMap({
           const latitude = Number(y);
           const longitude = Number(x);
           const coords = new kakao.maps.LatLng(latitude, longitude);
-          handleRegionCode(result[0].address.h_code);
+          dispatch(setLongitude(longitude));
+          dispatch(setLatitude(latitude));
+          dispatch(setRegionCode(result[0].address.h_code));
           setAddressInfo({
             region_1depth_name: address.split(' ')[0],
             region_2depth_name: address.split(' ')[1],

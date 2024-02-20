@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import ModalBackground from './ModalBackground';
 import Spinner from '@components/Auth/Spinner';
@@ -82,7 +82,7 @@ interface IConfirmModalProps {
   content: string;
   confirmedContent?: string;
   closeAction: () => void;
-  onConfirmAction: () => void;
+  onConfirmAction: () => Promise<void>;
   onCompletedAction?: () => void;
   confirmType?: string;
 }
@@ -92,7 +92,7 @@ function ConfirmModal({
   title,
   confirmedTitle,
   content,
-  confirmedContent,
+  confirmedContent: initConfirmContent,
   onConfirmAction,
   closeAction,
   onCompletedAction,
@@ -100,17 +100,17 @@ function ConfirmModal({
 }: IConfirmModalProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmedContent, setConfirmedContent] = useState(initConfirmContent);
 
   // onConfirmAction이 동기/비동기 모두를 처리할 수 있도록 처리
   const onInitialOkBtnClick = async () => {
     setIsLoading(true);
     try {
-      await Promise.resolve(onConfirmAction());
+      await onConfirmAction();
       setIsConfirmed(true);
-    } catch (error) {
-      console.error(error);
-      alert('오류가 발생했습니다. 잠시후 다시 시도해 주세요.' + error);
-      closeAction();
+    } catch (error: any) {
+      setIsConfirmed(true);
+      setConfirmedContent(error.message as string);
     } finally {
       setIsLoading(false);
     }

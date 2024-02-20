@@ -16,9 +16,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
       { serviceName: OAuthServiceType; code: string }
     >({
       query: ({ serviceName, code }) => ({
-        url: `users/login/${serviceName}?authorizationCode=${code}${
-          serviceName === 'naver' ? 'naver' : ''
-        }`,
+        url: `users/login/${serviceName}?authorizationCode=${code}&env=${
+          import.meta.env.DEV ? 'dev' : 'prod'
+        }${serviceName === 'naver' ? '&state=true' : ''}`,
         method: 'POST',
       }),
       transformResponse: (

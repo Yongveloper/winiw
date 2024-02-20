@@ -12,6 +12,13 @@ export interface IResponse<T> {
   data: T;
 }
 
+export interface IAddressRequest {
+  latitude: number;
+  longitude: number;
+  regionCode: string;
+  type: string;
+}
+
 export interface ITokens {
   accessToken: string;
   refreshToken: string;
@@ -29,10 +36,7 @@ export interface IRegisterRequest {
   authType: OAuthServiceType;
   nickname: string;
   profileImage: string;
-  addressRequest: {
-    regionCode: string;
-    type: string;
-  };
+  addressRequest: IAddressRequest;
 }
 
 export type LoginResponse = IResponse<ITokens>;
