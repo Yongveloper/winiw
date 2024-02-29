@@ -47,11 +47,19 @@ interface ICommonModalProps {
 
 function CommonModal({ isOpen, title, closeAction }: ICommonModalProps) {
   if (!isOpen) return null;
+
+  const titleLines = title.split('\n').map((line, index) => (
+    <React.Fragment key={index}>
+      {line}
+      <br />
+    </React.Fragment>
+  ));
+
   return (
     <>
       <ModalBackground />
       <ModalWrapper>
-        <h1 className="title">{title}</h1>
+        <h1 className="title">{titleLines}</h1>
         <button className="close-btn" onClick={closeAction}>
           확인
         </button>

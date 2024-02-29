@@ -24,7 +24,9 @@ function EditProfile() {
         isEdit={true}
         defaultProfileImgSrc={user.profileImage || defaultProfileImg}
         defaultNickname={user.nickname}
-        defaultAddress={`${user.address.siDo} ${user.address.guGunSi} ${user.address.hdongName}`}
+        defaultAddress={`${user.address.siDo} ${user.address.guGunSi} ${
+          user.address.hdongName || user.address.eupMyeon
+        }`}
         handleSubmit={handleSubmit}
       />
       <ConfirmModal

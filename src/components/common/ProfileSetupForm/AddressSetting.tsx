@@ -10,6 +10,7 @@ import ActionButton from '@components/common/Buttons/ActionButton';
 import KakaoMap from './KakaoMap';
 import { useDispatch } from 'react-redux';
 import { resetState as resetCoordinate } from '@store/slices/coordinateSlice';
+import useModal from '@hooks/useModal';
 
 const MapContainer = styled.div`
   position: fixed;
@@ -39,26 +40,31 @@ interface IAddressSettingProps {
 function AddressSetting({ defaultAddress }: IAddressSettingProps) {
   const open = useDaumPostcodePopup();
   const dispatch = useDispatch();
-  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const {
+    isOpen: isOpenAddressModal,
+    open: openAddressModal,
+    close: closeAddressModal,
+  } = useModal();
   const [selectedAddress, setSelectedAddress] = useState(defaultAddress || '');
 
   const handleAddressSelect = (address: string) => {
     setSelectedAddress(address);
   };
 
-  const closeAddressModal = () => {
-    setAddressModalOpen(false);
+  const cancelAddressSetting = () => {
+    closeAddressModal();
+    dispatch(resetCoordinate());
   };
 
   const handelCurrentLocationBtnClick = () => {
     if (selectedAddress.length > 0) {
       handleAddressSelect('');
     }
-    setAddressModalOpen(true);
+    openAddressModal();
   };
 
   const handleComplete = (data: Address) => {
-    setAddressModalOpen(true);
+    openAddressModal();
     handleAddressSelect(data.address);
   };
 
@@ -93,12 +99,12 @@ function AddressSetting({ defaultAddress }: IAddressSettingProps) {
       >
         현재 동네로 설정
       </ActionButton>
-      {addressModalOpen && (
+      {isOpenAddressModal && (
         <MapContainer>
           <CommonHeader
             onClick={() => {
               handleAddressSelect('');
-              closeAddressModal();
+              cancelAddressSetting();
             }}
           >
             현재 동네

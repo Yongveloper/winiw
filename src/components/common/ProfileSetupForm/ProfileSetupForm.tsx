@@ -5,6 +5,8 @@ import BlueButton from '@components/common/Buttons/BlueButton';
 import ProfileImgSetting from './ProfileImgSetting';
 import NicknameSetting from './NicknameSetting';
 import AddressSetting from './AddressSetting';
+import { useSelector } from 'react-redux';
+import { RootState } from '@store/types';
 
 interface IProfileSetupFormProps {
   isEdit?: boolean;
@@ -25,6 +27,9 @@ function ProfileSetupForm({
   const [imgFile, setImgFile] = useState<File | null>(null);
   const [nickname, setNickname] = useState(defaultNickname);
   const [nicknameError, setNicknameError] = useState('');
+  const { latitude, longitude } = useSelector(
+    (state: RootState) => state.coordinateSetup
+  );
 
   const handleProfileImgSetting = useCallback(
     (imgSrc: string, imgFile: File) => {
@@ -78,7 +83,9 @@ function ProfileSetupForm({
           <AddressSetting defaultAddress={defaultAddress || ''} />
         </P.Section>
         <BlueButton
-          disabled={nicknameError.length > 1 || !nickname}
+          disabled={
+            nicknameError.length > 1 || !nickname || (!latitude && !longitude)
+          }
           maxWidth="100%"
           onClick={() => handleSubmit(nickname, imgFile)}
         >
