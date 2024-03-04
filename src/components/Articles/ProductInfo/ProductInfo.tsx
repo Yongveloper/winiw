@@ -1,3 +1,4 @@
+import { TRADE_TIME, TradeTimeType } from '@/types/PostTypes';
 import * as P from './ProductInfoStyles';
 import Title from '@components/common/BigTitle';
 
@@ -7,8 +8,8 @@ interface IProductInfoProps {
   uploadTime: string;
   deadLine: string;
   desiredCategory: string;
-  tradeTime: string;
-  price: string;
+  tradeTime: TradeTimeType;
+  price: number[];
   description: string;
 }
 
@@ -22,7 +23,23 @@ function ProductInfo({
   price,
   description,
 }: IProductInfoProps) {
-  // Todo: Props 형식 처리 해야됨. Ex) 날짜, 가격
+  let tradeTimeText = '';
+
+  switch (tradeTime) {
+    case TRADE_TIME.EARLY_MORNING:
+      tradeTimeText = '이른 아침(06시 ~ 09시)';
+      break;
+    case TRADE_TIME.MORNING:
+      tradeTimeText = '오전(09시 ~ 12시)';
+      break;
+    case TRADE_TIME.AFTERNOON:
+      tradeTimeText = '오후(12시 ~ 18시)';
+      break;
+    case TRADE_TIME.EVENING:
+      tradeTimeText = '저녁(18시 ~ 00시)';
+      break;
+  }
+
   return (
     <P.Container>
       <P.TitleContainer>
@@ -43,11 +60,13 @@ function ProductInfo({
         </div>
         <div>
           <P.InfoTitle>거래 가능 시간</P.InfoTitle>
-          <P.InfoDate>{tradeTime}</P.InfoDate>
+          <P.InfoDate>{tradeTimeText}</P.InfoDate>
         </div>
         <div>
           <P.InfoTitle>가격 제안</P.InfoTitle>
-          <div className="price">{price} 원</div>
+          <div className="price">
+            {price.map((item) => item.toLocaleString('kr-KR') + '원').join('~')}
+          </div>
         </div>
       </P.InfoContainer>
       <P.Description>{description}</P.Description>

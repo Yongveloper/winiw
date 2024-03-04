@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
 import * as A from './ArticlesStyles';
 import CommonHeader from '@components/common/CommonHeader/CommonHeader';
 import WriterProfile from '@/components/Articles/WriterProfile';
@@ -16,6 +15,14 @@ import defaultCharacterImg from '@Assets/Character_Icons/Character_circle.svg';
 import ConfirmModal from '@components/common/ConfirmModal';
 import ChatToOfferedUserContainer from '@components/Articles/ChatToOfferedUserContainer';
 import ProductImagesContainer from '@components/Articles/ProductImagesContainer';
+import {
+  useDeletePostMutation,
+  useGetPostDetailQuery,
+} from '@store/api/postApiSlice';
+import { useUser } from '@hooks/useUser';
+import Spinner from '@components/Auth/Spinner';
+import { format, parseISO } from 'date-fns';
+import { TRADE_TYPE } from '@/types/PostTypes';
 
 // 더미데이터
 const offers: OfferPostTypes[] = [
@@ -66,6 +73,17 @@ const offers: OfferPostTypes[] = [
 
 function Articles() {
   const navigate = useNavigate();
+  const { data: { data: user } = {} } = useUser();
+  // Todo: 게시물 생성 완료되면 해당 게시물 id로 상세 정보 가져오기
+  const { data: post, isLoading, isError } = useGetPostDetailQuery('13');
+
+  if (isError) {
+    navigate('/error', { replace: true });
+  }
+
+  const [deletePost, { isLoading: isDeletePostLoading }] =
+    useDeletePostMutation();
+
   const { isOpen, open, close } = useModal();
   const {
     isOpen: isDeleteModalOpen,
@@ -77,53 +95,29 @@ function Articles() {
     open: chatToOfferedUserModalOpen,
     close: chatToOfferedUserModalClose,
   } = useModal();
-  const timeDifference = useTimeDiff(new Date('2023-08-08T23:00:00')); // Todo: createdAt으로 변경
+  const timeDifference = post?.createdAt ? useTimeDiff(post.createdAt) : null;
   const { id } = useParams();
-
-  const [isOfferPost, setIsOfferPost] = useState(false); // Todo: API 명세서 나오면 수정 필요 (1:1, offerPost 구분)
-  const isOwner = true; // Todo: API 명세서 나오면 수정 필요 (게시글 작성자 id와 로그인된 id로 구분)
+  const [isOwner, setIsOwner] = useState(false);
 
   const handleDeletePost = async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log(id, '삭제');
-        resolve(null);
-      }, 2000);
-    });
-  };
-
-  const handleDeleteComplete = () => {
-    navigate('/', { replace: true });
+    try {
+      await deletePost('13').unwrap();
+      navigate('/', { replace: true });
+    } catch (error: any) {
+      throw new Error(error.data.message);
+    }
   };
 
   // 1:1 거래일 시 채팅하기 버튼 클릭 시
   const handleDirectChatInitiation = () => {};
 
-  // Todo: id를 통해 해당 게시글 정보 가져오기
   useEffect(() => {
-    // 더미데이터: 임시 id로 짝수면 오퍼 게시글, 홀수면 1:1 게시글
-    if (Number(id) % 2 === 0) {
-      setIsOfferPost(true);
+    if (post && user) {
+      setIsOwner(post.writer.id === user.id);
     }
-  }, []);
+  }, [post, user]);
 
-  //Todo : 게시글 정보 --> 수정게시물에 props로 전달
-  const ProductInfoData = {
-    exChangeType: '물물',
-    isOfferPost: isOfferPost, //오퍼 혹은 1:1;
-    title: '여성용 나비 선글라스',
-    category: '의류',
-    deadLine: '2023년 08월 17일',
-    desiredCategory: '의류',
-    tradeTime: '오전(09시~12시)',
-    price: [21000, 24000],
-    description: '2년 간 사용했고, 기스가 좀 있습니다.',
-  };
-
-  const dumyImages = [
-    'https://health.chosun.com/site/data/img_dir/2021/06/08/2021060801363_0.jpg',
-    'https://health.chosun.com/site/data/img_dir/2021/06/08/2021060801363_0.jpg',
-  ];
+  if (isLoading) return <Spinner />;
 
   return (
     <>
@@ -131,44 +125,49 @@ function Articles() {
         상세 페이지
       </CommonHeader>
       <A.Container>
-        {dumyImages.length > 0 && (
-          <ProductImagesContainer images={dumyImages} />
+        {post?.images.length > 0 && (
+          <ProductImagesContainer images={post.images} />
         )}
         <A.ContentsContainer>
           <WriterProfile
-            profileImg={defaultCharacterImg} // Todo: ImgSrc가 있으면 해당 이미지 아니면 기본 이미지
-            nickname="동그란 딸기"
-            location="한강로동"
+            profileImg={post?.writer.profileImage || defaultCharacterImg}
+            nickname={post?.writer.nickname}
+            location={
+              post?.writer.address.hdongName || post?.writer.address.eupMyeon
+            }
             rating="three"
           />
           <ProductInfo
-            title="여성용 나비 선글라스"
-            category="의류"
+            title={post?.title}
+            category={post?.wishCategory}
             uploadTime={timeDifference}
-            deadLine="2023년 08월 17일"
-            desiredCategory="의류"
-            tradeTime="오전(09시~12시)"
-            price="21,000~24,000"
-            description="2년 간 사용했고, 기스가 좀 있습니다."
+            deadLine={format(parseISO(post?.closeAt), 'yyyy년 MM월 dd일')}
+            desiredCategory={post?.provisionCategory}
+            tradeTime={post?.tradeTime}
+            price={post?.suggestedPrice}
+            description={post?.content}
           />
           <LikeAndComment likeCount="3" commentCount="3" />
-          {isOfferPost && <OfferItemLists offers={offers} isOwner={isOwner} />}
+          {post.tradeType === TRADE_TYPE.OFFER && (
+            <OfferItemLists offers={offers} isOwner={isOwner} />
+          )}
         </A.ContentsContainer>
       </A.Container>
       <PostActionButtons
-        isOfferPost={isOfferPost}
+        isOfferPost={post.tradeType === TRADE_TYPE.OFFER}
         isOwner={isOwner}
+        isEnded={new Date(post?.closeAt).getTime() < Date.now()}
         onChatButtonClick={
-          isOfferPost ? chatToOfferedUserModalOpen : handleDirectChatInitiation
+          post.tradeType === TRADE_TYPE.OFFER
+            ? chatToOfferedUserModalOpen
+            : handleDirectChatInitiation
         } // 오퍼 게시물 일때 채팅하기 버튼 클릭 시 모달 오픈, 1:1 게시물 일때 채팅하기 버튼 클릭 시 바로 채팅방으로 이동
       />
+      {isDeletePostLoading && <Spinner />}
       {isOpen && (
         <BottomSheet height={'200px'} onClick={close}>
-          {/* Todo: 수정, 삭제 기능 추가 해야함 */}
           <A.CorrectionButton
-            onClick={() =>
-              navigate(`edit/select-element`, { state: ProductInfoData })
-            }
+            onClick={() => navigate(`edit/select-element`, { state: post })}
           >
             게시물 수정
           </A.CorrectionButton>
@@ -193,7 +192,6 @@ function Articles() {
         content="게시물을 삭제하시겠습니까?"
         confirmedContent="게시물이 삭제되었습니다."
         onConfirmAction={handleDeletePost}
-        onCompletedAction={handleDeleteComplete}
         closeAction={deleteModalClose}
       />
     </>
